@@ -1,0 +1,58 @@
+// happy birthday
+
+INSTRUMENTS
+    0   2                         E-Piano on bank 0
+    1   ELECTRIC_GRAND_PIANO,0    E-Piano on bank 0
+    2   ELECTRIC_GRAND_PIANO,0/0  E-Piano on bank 0
+    3   2,0/0                     E-Piano on bank 0
+    4   40                        Fiddle
+    5   ACOUSTIC_BASS             Bass
+    p   ELECTRONIC                E-Drums on bank 0
+    10  ELECTRONIC,120            E-Drums on bank 15360
+    11  ELECTRONIC,120/0          E-Drums on bank 15360
+    12  ELECTRONIC,15360          E-Drums on bank 15360
+    13  24,120                    E-Drums on bank 15360
+    14  24,120/0                  E-Drums on bank 15360
+    15  24,15360                  E-Drums on bank 15360
+END
+
+0  c  /8.  lyrics=Hap
+0  c  /16  l=py_
+0  d  /4   l=birth
+0  c  /4   l=day_
+0  f  /4   l=to_
+0  e  /2   l=you\c\r
+
+0  c  /8.  l=hap
+0  c  /16  l=py_
+0  d  /4   l=birth
+0  c  /4   l=day_
+0  g  /4   l=to_
+0  f  /2   l=you.\n
+
+0  c  /8.  l=Hap
+0  c  /16  l=py...
+
+
+*
+0 - /4
+1 c /32
+
+INSTRUMENTS
+    0   41,0/0         Viola (Standard)
+    5   HARPSICHORD,8  Cembalo
+    p   ROOM           Room Drumset
+    15  CELLO          Violoncello
+END
+
+*
+0 - /4
+1 c /32
+
+INSTRUMENT  0  PIZZICATO_STRINGS
+INSTRUMENT  1  STEEL_GUITAR,16/0  Mandolin
+
+*
+0 - /4
+1 c /32
+
