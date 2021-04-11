@@ -20,6 +20,7 @@ ALDA_DIR=$REPO_DIR/data/demo                                 # directory with AL
 ABC_DIR=$REPO_DIR/data/demo                                  # directory with ABC file examples
 LY_DIR=$REPO_DIR/data/demo                                   # directory with LilyPond examples
 MSCORE_DIR=$REPO_DIR/data/mscore/demo                        # directory with examples that can be imported by MuseScore
+DECOMPILE_DIR=$REPO_DIR/data/decompile                       # directory for exporting temporary decompiled files
 TUT_FILES_DIR=$REPO_DIR/data/tutorial                        # directory with files needed for tutorial-related screenshots
 SF2_PATH_DEFAULT="$SF2_DIR/FluidR3_GM.sf2"                   # path to the default soundfont
 SF2_PATH_GU="$SF2_DIR/GeneralUser GS FluidSynth v1.44.sf2"   # path to a soundfont that can demonstrate multi-channel drumkits
@@ -213,35 +214,35 @@ screenshot_active_window main
 # config section
 xdotool key "alt+l"   # open combobox: language
 sleep 0.1
-screenshot_region config_1_language 132 60 220 67
+screenshot_region config_1_language 129 60 220 67
 xdotool key "alt+n"   # open combobox: note system
 sleep 0.1
-screenshot_region config_2_notes 132 90 220 142
+screenshot_region config_2_notes 129 90 220 142
 xdotool key "alt+h"   # open combobox: half tone symbol
 sleep 0.1
-screenshot_region config_3_halftone 132 120 220 84
+screenshot_region config_3_halftone 129 120 220 84
 xdotool key "alt+d"   # open combobox: default half tone
 sleep 0.1
-screenshot_region config_4_ht_default 132 149 220 65
+screenshot_region config_4_ht_default 129 149 220 65
 xdotool key "alt+o"   # open combobox: octave naming
 sleep 0.1
-screenshot_region config_5_octave 132 178 220 103
+screenshot_region config_5_octave 129 178 220 103
 xdotool key "alt+s"   # open combobox: syntax
 sleep 0.1
-screenshot_region config_6_syntax 132 207 220 84
+screenshot_region config_6_syntax 129 207 220 84
 xdotool key "alt+p"   # open combobox: percussion IDs
 sleep 0.1
-screenshot_region config_7_percussion 132 236 220 66
+screenshot_region config_7_percussion 129 236 220 66
 xdotool key "alt+i"   # open combobox: instrument IDs
 sleep 0.1
-screenshot_region config_8_instrument 132 264 220 67
+screenshot_region config_8_instrument 129 264 220 67
 xdotool key "Escape"  # close open combobox
 sleep 0.1
 
-screenshot_region import_0 367 43 193 141      # import area
-screenshot_region soundfont_0 367 195 193 100  # soundfont area
-screenshot_region export_0 367 307 193 78      # export area
-screenshot_region player_0 15 331 346 55       # player area
+screenshot_region import_0 364 43 193 141      # import area
+screenshot_region soundfont_0 364 195 193 100  # soundfont area
+screenshot_region export_0 364 307 193 78      # export area
+screenshot_region player_0 12 331 346 55       # player area
 
 ##############
 # PLAYER: ICONS - SUCCESS / FAILED
@@ -249,13 +250,13 @@ screenshot_region player_0 15 331 346 55       # player area
 
 xdotool key "p"                                        # open player
 sleep 7
-screenshot_region player_8_parse_success 330 37 36 36  # success icon
+screenshot_region player_8_parse_success 327 37 36 36  # success icon
 echo test >> $MPL_DIR/london_bridge.midica             # add extra line to make the file fail
 xdotool key "F5"                                       # reload
 sleep 3
 xdotool key "Escape"                                   # close error message
 sleep 0.3
-screenshot_region player_9_parse_failure 330 37 36 36  # failed icon
+screenshot_region player_9_parse_failure 327 37 36 36  # failed icon
 sed -i '$ d' $MPL_DIR/london_bridge.midica             # remove the extra line
 xdotool key "F5"                                       # reload
 sleep 3
@@ -297,6 +298,50 @@ open_export_file_chooser 3 $ALDA_DIR a-midi-song-i-found-on-the-internet.alda  #
 screenshot_active_window export_3_alda
 
 ##############
+# DECOMPILE CONFIG
+##############
+
+# decompile config button (default and mouseover)
+screenshot_region dc_button           168 336 36 37
+xdotool mousemove 180 350      # hover the button
+sleep 0.1
+screenshot_region dc_button_mouse 168 336 36 37
+xdotool mousemove 5 5          # un-hover the button
+
+# decompile config window
+xdotool key "alt+d"
+sleep 0.5
+screenshot_active_window dc_1_debugging
+xdotool key "2"
+sleep 0.1
+screenshot_active_window dc_2_note_length
+xdotool key "3"
+sleep 0.1
+screenshot_active_window dc_3_chords
+xdotool key "4"
+sleep 0.1
+screenshot_active_window dc_4_notes_rests
+xdotool key "5"
+sleep 0.1
+screenshot_active_window dc_5_karaoke
+xdotool key "6"
+sleep 0.1
+screenshot_active_window dc_6_control_change
+xdotool key "7"
+sleep 0.1
+screenshot_active_window dc_7_extra_slices
+
+# decompile config button (default and invalid)
+xdotool key "ctrl+e"    # go to the text area (edit directly)
+xdotool key "x"         # invalid character
+xdotool key "Escape"    # close decompile confifg window
+sleep 0.1
+screenshot_region dc_button_invalid 168 336 36 37
+xdotool mousemove 180 350      # hover the button
+sleep 0.1
+screenshot_region dc_button_invalid_mouse 168 336 36 37
+
+##############
 # PLAYER
 ##############
 start_midica "--soundfont=$SF2_PATH_GU" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
@@ -309,20 +354,20 @@ sleep 0.2
 
 # player screenshots
 screenshot_active_window player_1
-screenshot_region player_2_jump 16 42 204 28         # memorize button, textfield, go button
-screenshot_region player_3_time 592 41 130 28        # time/ticks (upper right corner)
-screenshot_region player_4_progress 13 73 705 50     # progress bar
-screenshot_region player_5_control 13 122 520 30     # control buttons (stop, <<, <, play, >, >>)
-screenshot_region player_6_sliders 532 120 182 436   # sliders for volume, tempo and transposition
-screenshot_region player_7_reparse 536 556 76 29     # reparse button
+screenshot_region player_2_jump 13 42 204 28         # memorize button, textfield, go button
+screenshot_region player_3_time 589 41 130 28        # time/ticks (upper right corner)
+screenshot_region player_4_progress 10 73 705 50     # progress bar
+screenshot_region player_5_control 10 122 520 30     # control buttons (stop, <<, <, play, >, >>)
+screenshot_region player_6_sliders 529 120 182 436   # sliders for volume, tempo and transposition
+screenshot_region player_7_reparse 533 556 76 29     # reparse button
 
 # channel overview
 xdotool key "alt+0"                                  # mute channel 0
 xdotool key "alt+4"                                  # mute channel 4
-screenshot_region channel_1_overview 19 162 367 448  # channel overview (all channels still closed)
+screenshot_region channel_1_overview 16 162 367 448  # channel overview (all channels still closed)
 xdotool key "1"                                      # open details of channel 1
 sleep 0.2
-screenshot_region channel_2_details 19 207 451 351   # channel details (opened)
+screenshot_region channel_2_details 16 207 451 351   # channel details (opened)
 xdotool key "1"
 
 # karaoke mode
@@ -361,7 +406,7 @@ xdotool key "Down"
 xdotool key "Down"
 xdotool key "Down"                                   # select room drumkit
 sleep 1
-screenshot_region soundcheck_2_drum 96 39 492 425    # drumkits table
+screenshot_region soundcheck_2_drum 93 39 492 425    # drumkits table
 
 # chromatic instruments
 xdotool key "2"                                      # select channel 2 (chromatic)
@@ -387,7 +432,7 @@ done
 sleep 2
 xdotool key "ctrl+shift+v"                           # focus velocity slider
 sleep 2
-screenshot_region soundcheck_3_chromatic 96 39 492 775  # combobox, instruments table and notes table
+screenshot_region soundcheck_3_chromatic 93 39 492 775  # combobox, instruments table and notes table
 
 # percussion
 xdotool key "9"                  # select channel 9 (percussion)
@@ -401,7 +446,7 @@ for ((i=0; i<11; i++)); do
 	xdotool key "Down"
 done
 sleep 2
-screenshot_region soundcheck_4_percussion 96 465 492 345  # percussion instruments table
+screenshot_region soundcheck_4_percussion 93 465 492 345  # percussion instruments table
 
 # close soundcheck window
 xdotool key "Escape"
@@ -575,23 +620,76 @@ sleep 0.2
 screenshot_active_window info_about
 
 ###############
+# TABLE FILTER
+###############
+
+xdotool key "shift+Tab"                                        # focus the tabs
+xdotool key "c"                                                # focus the configuration tab
+sleep 0.1
+screenshot_region table_filter_btn 564 66 28 28                # filter button (default)
+xdotool mousemove 575 77                                       # hover the button
+sleep 0.1
+screenshot_region table_filter_btn_mouse 564 66 28 28          # filter button (default + mouseover)
+xdotool mousemove 5 5                                          # un-hover the button
+xdotool key "f"                                                # open the table filter
+sleep 0.1
+xdotool type "a#"                                              # type a string into the filter field
+sleep 0.1
+screenshot_active_window table_filter
+xdotool key "Escape"                                           # close the table filter
+sleep 0.1
+screenshot_region table_filter_btn_changed 564 66 28 28        # filter button (changed)
+xdotool mousemove 575 77                                       # hover the button
+sleep 0.1
+screenshot_region table_filter_btn_changed_mouse 564 66 28 28  # filter button (changed + mouseover)
+
+###############
+# DECOMPILE RESULT
+###############
+
+rm $DECOMPILE_DIR/tmpfile.mpl                            # delete the exported file, if not yet done
+xdotool key "Escape"                                     # close info window
+sleep 0.5
+open_export_file_chooser 1 . x                           # open exporter
+open_export_file_chooser 2 $DECOMPILE_DIR tmpfile.mpl    # switch to the MidicaPL tab
+sleep 0.1
+xdotool key "Return"                                     # export the file
+sleep 1.0
+xdotool mousemove 566 207 click 1                        # focus the first table row
+for ((i=0; i<16; i++)); do
+	xdotool key "Page_Down"                          # go down a few pages
+done
+for ((i=0; i<10; i++)); do
+	xdotool key "Down"                               # go down a few lines
+done
+sleep 0.1
+xdotool key "Page_Up"                                    # go up one page
+sleep 0.1
+for ((i=0; i<5; i++)); do
+	xdotool key "Down"                               # go down a few lines
+done
+sleep 0.5
+screenshot_active_window dc_result
+rm $DECOMPILE_DIR/tmpfile.mpl                            # delete the exported file
+
+###############
 # TUTORIAL
 ###############
 
 start_midica "--soundfont=$SF2_PATH_GU" "--import=$TUT_FILES_DIR/happy_birthday_instruments.midica"
 xdotool key "p"                                        # open player
 sleep 7
-screenshot_region_tutorial instruments-2 20 162 395 449
+screenshot_region_tutorial instruments-2 17 162 395 449
 go_to_tick 7000
 sleep 0.2
-screenshot_region_tutorial instruments-3 20 162 395 449
+screenshot_region_tutorial instruments-3 17 162 395 449
 go_to_tick 7400
 sleep 0.2
-screenshot_region_tutorial instrument    20 162 395 89
+screenshot_region_tutorial instrument    17 162 395 89
 go_to_tick 2900
 xdotool key "l"                                        # switch to karaoke mode
 sleep 0.2
-screenshot_region_tutorial happy-birthday-3 12 37 275 255
+screenshot_region_tutorial happy-birthday-3 9 37 275 255
 
 ###############
 # FINALIZE
