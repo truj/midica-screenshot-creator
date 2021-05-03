@@ -2,7 +2,7 @@
 
 Shell script to auto-generate screenshots of the Midica application.
 
-It's used to re-create screenshot images for the documentation website (midica.org).
+It's used to re-create screenshot images for the documentation website (midica.org), and also for the Midica repository itself.
 
 Therefore it starts Midica several times with different soundfonts and import files
 and emulates keyboard and mouse actions, while taking screenshots and storing them to
@@ -37,5 +37,5 @@ Automization solves this problem.
 
 # Limits
 
-- Tested only on my personal computer. Maybe it even works only there.
+- Tested only on my personal computer. Most likely it works only there.
 - This repository provides only the script but no example files to be imported/exported and also no soundfont files. This is mainly due to copyright issues but it's also because of lazyness.

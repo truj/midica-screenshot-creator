@@ -9,7 +9,8 @@
 # CONFIGURATION
 #################
 
-MIDICA_JAR=~/github/midica/midica.jar                        # path to midica.jar
+MIDICA_DIR=~/github/midica                                   # path to the midica repository
+MIDICA_JAR=$MIDICA_DIR/midica.jar                            # path to midica.jar
 REPO_DIR=~/github/midica-screenshot-creator                  # path to this repository
 SCR_DIR=~/github/midica.org/src/assets/img                   # target path for most screenshots
 TUT_DIR=~/github/midica.org/src/assets/examples              # target path for screenshots for the tutorial
@@ -690,6 +691,14 @@ go_to_tick 2900
 xdotool key "l"                                        # switch to karaoke mode
 sleep 0.2
 screenshot_region_tutorial happy-birthday-3 9 37 275 255
+
+###############
+# MIDICA REPOSITORY
+###############
+
+cp $SCR_DIR/main.png     $MIDICA_DIR/img/main.png
+cp $SCR_DIR/player_1.png $MIDICA_DIR/img/player.png
+cp $SCR_DIR/karaoke.png  $MIDICA_DIR/img/karaoke.png
 
 ###############
 # FINALIZE
