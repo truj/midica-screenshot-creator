@@ -14,17 +14,21 @@ MIDICA_JAR=$MIDICA_DIR/midica.jar                            # path to midica.ja
 REPO_DIR=~/github/midica-screenshot-creator                  # path to this repository
 SCR_DIR=~/github/midica.org/src/assets/img                   # target path for most screenshots
 TUT_DIR=~/github/midica.org/src/assets/examples              # target path for screenshots for the tutorial
-SF2_DIR=$REPO_DIR/data/soundfonts                            # soundfont directory
+SB_DIR=$REPO_DIR/data/soundbanks                             # soundbank directory
+SB_DIR_CACHE=$REPO_DIR/data/soundbanks_cached                # soundbank cache directory
+SB_DIR_CACHE_REAL=~/.midica.d/sound_cache                    # REAL soundbank cache directory
+SB_URL=http://example.com/my/favourite/soundbank.dls         # soundbank URL
 MPL_DIR=$REPO_DIR/data/examples                              # directory with MidicaPL examples
 MIDI_DIR=$REPO_DIR/data/demo                                 # directory with MIDI file examples
 ALDA_DIR=$REPO_DIR/data/demo                                 # directory with ALDA file examples
 ABC_DIR=$REPO_DIR/data/demo                                  # directory with ABC file examples
 LY_DIR=$REPO_DIR/data/demo                                   # directory with LilyPond examples
 MSCORE_DIR=$REPO_DIR/data/mscore/demo                        # directory with examples that can be imported by MuseScore
+AUDIO_DIR=$REPO_DIR/data/demo                                # directory with audio files
 DECOMPILE_DIR=$REPO_DIR/data/decompile                       # directory for exporting temporary decompiled files
 TUT_FILES_DIR=$REPO_DIR/data/tutorial                        # directory with files needed for tutorial-related screenshots
-SF2_PATH_DEFAULT="$SF2_DIR/FluidR3_GM.sf2"                   # path to the default soundfont
-SF2_PATH_GU="$SF2_DIR/GeneralUser GS FluidSynth v1.44.sf2"   # path to a soundfont that can demonstrate multi-channel drumkits
+SB_PATH_DEFAULT="$SB_DIR/FluidR3_GM.sf2"                     # path to the default soundbank
+SB_PATH_GU="$SB_DIR/GeneralUser GS FluidSynth v1.44.sf2"     # path to a soundbank that can demonstrate multi-channel drumkits
 
 
 ##############
@@ -35,15 +39,15 @@ SF2_PATH_GU="$SF2_DIR/GeneralUser GS FluidSynth v1.44.sf2"   # path to a soundfo
 # Starts a new instance.
 # 
 # Parameters:
-# - soundfont parameter to midica, including the parameter name (--soundfont=PATH)
+# - soundbank parameter to midica, including the parameter name (--soundbank=PATH)
 # - import file parameter to midica, including the parameter name (--import=PATH or --import-midi=PATH)
 function start_midica {
 	if [[ "$MIDICA_PID" != "" ]]; then
 		kill -9 $MIDICA_PID
 	fi
-	SOUNDFONT=$1
+	SOUNDBANK=$1
 	IMPORT=$2
-	java -jar "$MIDICA_JAR" --ignore-local-config "$SOUNDFONT" "$IMPORT" & MIDICA_PID=$!
+	java -jar "$MIDICA_JAR" --ignore-local-config "$SOUNDBANK" "$IMPORT" & MIDICA_PID=$!
 	sleep 6
 }
 
@@ -93,7 +97,7 @@ function screenshot_region_tutorial {
 	maim --format=png --hidecursor -g ${WIDTH}x${HEIGHT}+$X+$Y > "$TUT_DIR/$FILE.png"
 }
 
-# Opens a file chooser for an import or soundfont file (if not yet done),
+# Opens a file chooser for an import or soundbank file (if not yet done),
 # switches to the given tab,
 # opens the given directory,
 # and selects the given file.
@@ -101,25 +105,34 @@ function screenshot_region_tutorial {
 # Assumes that the file chooser is already open, if the tab number is 0 or 1.
 # 
 # parameters:
-# - import|soundfont
+# - import|soundbank
 # - tab number
 # - file index
-# - directory
+# - directory (or URL)
 function open_file_chooser {
 	OPEN=$1
 	TAB=$2
 	DOWN=$3
 	DIR=$4
+	IS_URL=''
 	if [ "import" = "$OPEN" ]; then
 		OPEN="ctrl+o"
-	elif [ "soundfont" = "$OPEN" ]; then
+	elif [ "soundbank" = "$OPEN" ]; then
 		OPEN="ctrl+shift+s"
+		if [[ $TAB > 1 ]]; then
+			IS_URL='true'
+		fi
 	fi
 	if [[ $TAB < 2 ]]; then
 		xdotool key "$OPEN"  # open import file chooser
 		sleep 0.1
 	fi
 	xdotool key "ctrl+$TAB"
+	if [[ $IS_URL ]]; then
+		xdotool key "ctrl+u"
+		xdotool type "$DIR"   # URL
+		return
+	fi
 	xdotool key "alt+n"
 	xdotool key "ctrl+a"
 	xdotool type "$DIR"
@@ -207,9 +220,9 @@ cd "$REPO_DIR"
 MIDICA_PID=""
 
 # start Midica (main window)
-start_midica "--soundfont=$SF2_PATH_DEFAULT" "--import=$MPL_DIR/london_bridge.midica"
+start_midica "--soundbank=$SB_PATH_DEFAULT" "--import=$MPL_DIR/london_bridge.midica"
 
-xdotool mousemove 382 236 click 1  # click remember soundfont
+xdotool mousemove 382 236 click 1  # click remember soundbank
 screenshot_active_window main
 
 # config section
@@ -241,7 +254,7 @@ xdotool key "Escape"  # close open combobox
 sleep 0.1
 
 screenshot_region import_0 364 43 193 141      # import area
-screenshot_region soundfont_0 364 195 193 100  # soundfont area
+screenshot_region soundbank_0 364 195 193 100  # soundbank area
 screenshot_region export_0 364 307 193 78      # export area
 screenshot_region player_0 12 331 346 55       # player area
 
@@ -284,9 +297,19 @@ screenshot_active_window import_6_mscore
 xdotool key "Escape"                      # close file chooser
 sleep 0.1
 
-# soundfont file chooser
-open_file_chooser soundfont 0 0 $SF2_DIR
-screenshot_active_window soundfont_1
+# soundbank file chooser
+open_file_chooser soundbank 1 0 $SB_DIR   # file tab
+screenshot_active_window soundbank_1
+rm $SB_DIR_CACHE_REAL/*                       
+open_file_chooser soundbank 2 0 $SB_URL   # URL tab (with empty cache)
+sleep 0.1
+screenshot_active_window soundbank_2
+cp -t $SB_DIR_CACHE_REAL $SB_DIR_CACHE/*
+open_file_chooser soundbank 2 0 x         # URL tab (stay there, but with filled cache)
+xdotool key "BackSpace"                   # remove the "x" again
+sleep 0.1
+xdotool key "ctrl+d"                      # checkbox: delete cached soundbank
+screenshot_active_window soundbank_3
 xdotool key "Escape"
 sleep 0.3
 
@@ -297,21 +320,42 @@ open_export_file_chooser 2 $MPL_DIR a-midi-song-i-found-on-the-internet.mpl    #
 screenshot_active_window export_2_midica
 open_export_file_chooser 3 $ALDA_DIR a-midi-song-i-found-on-the-internet.alda  # ALDA export
 screenshot_active_window export_3_alda
+open_export_file_chooser 4 $AUDIO_DIR my-own-song.wav                          # Audio export
+screenshot_active_window export_4_audio
+open_export_file_chooser 5 $ABC_DIR my-own-song.abc                            # Audio export
+screenshot_active_window export_5_abc
+open_export_file_chooser 6 $LY_DIR my-own-song.ly                              # Audio export
+screenshot_active_window export_6_ly
+open_export_file_chooser 7 $MSCORE_DIR my-own-song.musicxml                    # Audio export
+screenshot_active_window export_7_mscore
+
+##############
+# AUDIO EXPORT CONFIG
+##############
+
+open_export_file_chooser 4 $AUDIO_DIR x.wav       # go back to the audio tab
+xdotool key "ctrl+o"                              # open audio config window
+sleep 0.2
+screenshot_active_window export_4_audio_options
+xdotool key "Escape"                              # close the audio config window
+sleep 0.1;
 
 ##############
 # DECOMPILE CONFIG
 ##############
 
+open_export_file_chooser 3 $ALDA_DIR x.alda    # go back to the alda tab
+
 # decompile config button (default and mouseover)
-screenshot_region dc_button           168 336 36 37
-xdotool mousemove 180 350      # hover the button
+screenshot_region dc_button           180 336 36 37
+xdotool mousemove 195 350      # hover the button
 sleep 0.1
-screenshot_region dc_button_mouse 168 336 36 37
+screenshot_region dc_button_mouse 180 336 36 37
 xdotool mousemove 5 5          # un-hover the button
 
 # decompile config window
-xdotool key "alt+d"
-sleep 0.5
+xdotool key "ctrl+o"
+sleep 0.7
 screenshot_active_window dc_1_debugging
 xdotool key "2"
 sleep 0.1
@@ -337,15 +381,15 @@ xdotool key "ctrl+e"    # go to the text area (edit directly)
 xdotool key "x"         # invalid character
 xdotool key "Escape"    # close decompile confifg window
 sleep 0.1
-screenshot_region dc_button_invalid 168 336 36 37
-xdotool mousemove 180 350      # hover the button
+screenshot_region dc_button_invalid 180 336 36 37
+xdotool mousemove 195 350      # hover the button
 sleep 0.1
-screenshot_region dc_button_invalid_mouse 168 336 36 37
+screenshot_region dc_button_invalid_mouse 180 336 36 37
 
 ##############
 # PLAYER
 ##############
-start_midica "--soundfont=$SF2_PATH_GU" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
+start_midica "--soundbank=$SB_PATH_GU" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
 
 # open player
 xdotool key "p"
@@ -365,6 +409,7 @@ screenshot_region player_7_reparse 533 556 76 29     # reparse button
 # channel overview
 xdotool key "alt+0"                                  # mute channel 0
 xdotool key "alt+4"                                  # mute channel 4
+sleep 0.1
 screenshot_region channel_1_overview 16 162 367 448  # channel overview (all channels still closed)
 xdotool key "1"                                      # open details of channel 1
 sleep 0.2
@@ -479,15 +524,15 @@ screenshot_active_window info_conf_instr
 xdotool key "Escape"                       # close info window
 sleep 0.5
 
-# soundfont
+# soundbank
 xdotool key "i"                            # open info window
 sleep 0.5
-xdotool key "Down"                         # select soundfont tab
+xdotool key "Down"                         # select soundbank tab
 sleep 0.2
-screenshot_active_window info_soundfont_general
+screenshot_active_window info_soundbank_general
 xdotool key "r"                            # select resources tab
 sleep 0.1
-screenshot_active_window info_soundfont_sample
+screenshot_active_window info_soundbank_sample
 xdotool key "Tab"
 xdotool key "Tab"
 xdotool key "Tab"                          # focus table
@@ -501,14 +546,14 @@ for ((i=0; i<4; i++)); do
 	xdotool mousemove 382 236 click 5  # scroll down (so that the layers headline is in the second visible line)
 done
 sleep 0.3
-screenshot_active_window info_soundfont_layer
+screenshot_active_window info_soundbank_layer
 xdotool key "i"                            # select tab "Instruments & Drum Kits"
 sleep 0.1
 resize "Midica Info" 973 1200              # make the window higher
-screenshot_active_window info_soundfont_instr
+screenshot_active_window info_soundbank_instr
 
 # midi info
-start_midica "--soundfont=$SF2_PATH_DEFAULT" "--import=$MPL_DIR/sk_london_bridge.midica"
+start_midica "--soundbank=$SB_PATH_DEFAULT" "--import=$MPL_DIR/sk_london_bridge.midica"
 xdotool key "i"                            # open info window
 sleep 1
 xdotool key "m"                            # select tab: MIDI
@@ -517,7 +562,7 @@ screenshot_active_window info_midi_general
 xdotool key "k"                            # select sub tab: Karaoke
 sleep 0.1
 screenshot_active_window info_midi_karaoke
-start_midica "--soundfont=$SF2_PATH_DEFAULT" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
+start_midica "--soundbank=$SB_PATH_DEFAULT" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
 xdotool key "i"                            # open info window
 sleep 1
 xdotool key "m"                            # select tab: MIDI
@@ -581,14 +626,16 @@ xdotool key  "Tab"    # focus the tree
 xdotool key  "Down"
 xdotool key  "Down"
 xdotool key  "Down"
+xdotool key  "Down"
 xdotool key  "Down"   # focus soundcheck node
 xdotool key  "Right"  # open soundcheck node
 xdotool key  "Up"
-xdotool key  "Up"     # focus main node
-xdotool key  "Right"  # open main node
+xdotool key  "Up"
+xdotool key  "Up"     # focus main window node
+xdotool key  "Right"  # open main window node
 xdotool key  "Down"
 xdotool key  "Down"
-xdotool key  "Down"   # focus node: "Load soundfont file"
+xdotool key  "Down"   # focus node: "Load soundbank file"
 sleep 0.2
 screenshot_active_window info_keybinding_1
 xdotool key  "f"          # focus the filter field
@@ -603,6 +650,7 @@ xdotool key  "Left"       # close soundcheck node
 xdotool key  "ctrl+Home"  # go to top node
 xdotool key  "Down"       # focus main node
 xdotool key  "Left"       # close main node
+xdotool key  "Down"
 xdotool key  "Down"
 xdotool key  "Down"
 xdotool key  "Down"
@@ -677,7 +725,7 @@ rm $DECOMPILE_DIR/tmpfile.mpl                            # delete the exported f
 # TUTORIAL
 ###############
 
-start_midica "--soundfont=$SF2_PATH_GU" "--import=$TUT_FILES_DIR/happy_birthday_instruments.midica"
+start_midica "--soundbank=$SB_PATH_GU" "--import=$TUT_FILES_DIR/happy_birthday_instruments.midica"
 xdotool key "p"                                        # open player
 sleep 7
 screenshot_region_tutorial instruments-2 17 162 395 449
