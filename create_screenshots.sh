@@ -30,6 +30,15 @@ TUT_FILES_DIR=$REPO_DIR/data/tutorial                        # directory with fi
 SB_PATH_DEFAULT="$SB_DIR/FluidR3_GM.sf2"                     # path to the default soundbank
 SB_PATH_GU="$SB_DIR/GeneralUser GS FluidSynth v1.44.sf2"     # path to a soundbank that can demonstrate multi-channel drumkits
 
+# used for screenshot_region and screenshot_region_*
+HORIZONTAL_OFFSET=5
+VERTICAL_OFFSET=0
+HORIZONTAL_OFFSET_XW1=3
+VERTICAL_OFFSET_XW1=0
+HORIZONTAL_OFFSET_XW2=4
+VERTICAL_OFFSET_XW2=0
+HORIZONTAL_OFFSET_TUTORIAL=3
+VERTICAL_OFFSET_TUTORIAL=0
 
 ##############
 # FUNCTIONS
@@ -72,8 +81,51 @@ function screenshot_active_window {
 # - height of the region in pixels
 function screenshot_region {
 	FILE=$1
-	X=$2
-	Y=$3
+	let X=$2+$HORIZONTAL_OFFSET
+	let Y=$3+$VERTICAL_OFFSET
+	WIDTH=$4
+	HEIGHT=$5
+	maim --format=png --hidecursor -g ${WIDTH}x${HEIGHT}+$X+$Y > "$SCR_DIR/$FILE.png"
+}
+
+# Creates a screenshot of a screen region in an extra window
+# and saves it in the target directory for screenshots
+#
+# Type of extra window:
+# - player
+# - decompile config view
+# 
+# parameters:
+# - target filename (without '.png' extension)
+# - x value of the upper left corner of the region
+# - y value of the upper left corner of the region
+# - width of the region in pixels
+# - height of the region in pixels
+function screenshot_region_xw1 {
+	FILE=$1
+	let X=$2+$HORIZONTAL_OFFSET_XW1
+	let Y=$3+$VERTICAL_OFFSET_XW1
+	WIDTH=$4
+	HEIGHT=$5
+	maim --format=png --hidecursor -g ${WIDTH}x${HEIGHT}+$X+$Y > "$SCR_DIR/$FILE.png"
+}
+
+# Creates a screenshot of a screen region in an extra window
+# and saves it in the target directory for screenshots
+#
+# Type of extra window:
+# - info window
+# 
+# parameters:
+# - target filename (without '.png' extension)
+# - x value of the upper left corner of the region
+# - y value of the upper left corner of the region
+# - width of the region in pixels
+# - height of the region in pixels
+function screenshot_region_xw2 {
+	FILE=$1
+	let X=$2+$HORIZONTAL_OFFSET_XW2
+	let Y=$3+$VERTICAL_OFFSET_XW2
 	WIDTH=$4
 	HEIGHT=$5
 	maim --format=png --hidecursor -g ${WIDTH}x${HEIGHT}+$X+$Y > "$SCR_DIR/$FILE.png"
@@ -90,8 +142,8 @@ function screenshot_region {
 # - height of the region in pixels
 function screenshot_region_tutorial {
 	FILE=$1
-	X=$2
-	Y=$3
+	let X=$2+$HORIZONTAL_OFFSET_TUTORIAL
+	let Y=$3+$VERTICAL_OFFSET_TUTORIAL
 	WIDTH=$4
 	HEIGHT=$5
 	maim --format=png --hidecursor -g ${WIDTH}x${HEIGHT}+$X+$Y > "$TUT_DIR/$FILE.png"
@@ -211,6 +263,11 @@ function resize {
 	sleep 0.5
 }
 
+# moves the mouse out of the way
+function move_mouse_away {
+	xdotool mousemove 1400 236
+}
+
 ##############
 # MAIN WINDOW
 ##############
@@ -253,28 +310,28 @@ screenshot_region config_8_instrument 129 264 220 67
 xdotool key "Escape"  # close open combobox
 sleep 0.1
 
-screenshot_region import_0 364 43 193 141      # import area
-screenshot_region soundbank_0 364 195 193 100  # soundbank area
-screenshot_region export_0 364 307 193 78      # export area
-screenshot_region player_0 12 331 346 55       # player area
+screenshot_region import_0 364 43 191 141      # import area
+screenshot_region soundbank_0 364 195 191 100  # soundbank area
+screenshot_region export_0 364 307 191 78      # export area
+screenshot_region player_0 10 331 348 55       # player area
 
 ##############
 # PLAYER: ICONS - SUCCESS / FAILED
 ##############
 
-xdotool key "p"                                        # open player
+xdotool key "p"                                            # open player
 sleep 7
-screenshot_region player_8_parse_success 327 37 36 36  # success icon
-echo test >> $MPL_DIR/london_bridge.midica             # add extra line to make the file fail
-xdotool key "F5"                                       # reload
+screenshot_region_xw1 player_8_parse_success 328 37 36 36  # success icon
+echo test >> $MPL_DIR/london_bridge.midica                 # add extra line to make the file fail
+xdotool key "F5"                                           # reload
 sleep 3
-xdotool key "Escape"                                   # close error message
+xdotool key "Escape"                                       # close error message
 sleep 0.3
-screenshot_region player_9_parse_failure 327 37 36 36  # failed icon
-sed -i '$ d' $MPL_DIR/london_bridge.midica             # remove the extra line
-xdotool key "F5"                                       # reload
+screenshot_region_xw1 player_9_parse_failure 328 37 36 36  # failed icon
+sed -i '$ d' $MPL_DIR/london_bridge.midica                 # remove the extra line
+xdotool key "F5"                                           # reload
 sleep 3
-xdotool key "alt+F4"                                   # close player
+xdotool key "alt+F4"                                       # close player
 sleep 0.3
 
 ##############
@@ -347,10 +404,10 @@ sleep 0.1;
 open_export_file_chooser 3 $ALDA_DIR x.alda    # go back to the alda tab
 
 # decompile config button (default and mouseover)
-screenshot_region dc_button           180 336 36 37
+screenshot_region_xw1 dc_button 180 336 36 37
 xdotool mousemove 195 350      # hover the button
 sleep 0.1
-screenshot_region dc_button_mouse 180 336 36 37
+screenshot_region_xw1 dc_button_mouse 180 336 36 37
 xdotool mousemove 5 5          # un-hover the button
 
 # decompile config window
@@ -375,16 +432,19 @@ screenshot_active_window dc_6_control_change
 xdotool key "7"
 sleep 0.1
 screenshot_active_window dc_7_extra_slices
+xdotool key "8"
+sleep 0.1
+screenshot_active_window dc_8_line_settings
 
 # decompile config button (default and invalid)
 xdotool key "ctrl+e"    # go to the text area (edit directly)
 xdotool key "x"         # invalid character
 xdotool key "Escape"    # close decompile confifg window
 sleep 0.1
-screenshot_region dc_button_invalid 180 336 36 37
+screenshot_region_xw1 dc_button_invalid 180 336 36 37
 xdotool mousemove 195 350      # hover the button
-sleep 0.1
-screenshot_region dc_button_invalid_mouse 180 336 36 37
+sleep 0.2
+screenshot_region_xw1 dc_button_invalid_mouse 180 336 36 37
 
 ##############
 # PLAYER
@@ -399,21 +459,21 @@ sleep 0.2
 
 # player screenshots
 screenshot_active_window player_1
-screenshot_region player_2_jump 13 42 204 28         # memorize button, textfield, go button
-screenshot_region player_3_time 589 41 130 28        # time/ticks (upper right corner)
-screenshot_region player_4_progress 10 73 705 50     # progress bar
-screenshot_region player_5_control 10 122 520 30     # control buttons (stop, <<, <, play, >, >>)
-screenshot_region player_6_sliders 529 120 182 436   # sliders for volume, tempo and transposition
-screenshot_region player_7_reparse 533 556 76 29     # reparse button
+screenshot_region_xw1 player_2_jump 13 42 204 28         # memorize button, textfield, go button
+screenshot_region_xw1 player_3_time 589 41 130 28        # time/ticks (upper right corner)
+screenshot_region_xw1 player_4_progress 10 73 705 50     # progress bar
+screenshot_region_xw1 player_5_control 10 122 520 30     # control buttons (stop, <<, <, play, >, >>)
+screenshot_region_xw1 player_6_sliders 529 120 182 436   # sliders for volume, tempo and transposition
+screenshot_region_xw1 player_7_reparse 533 556 76 29     # reparse button
 
 # channel overview
-xdotool key "alt+0"                                  # mute channel 0
-xdotool key "alt+4"                                  # mute channel 4
+xdotool key "alt+0"                                      # mute channel 0
+xdotool key "alt+4"                                      # mute channel 4
 sleep 0.1
-screenshot_region channel_1_overview 16 162 367 448  # channel overview (all channels still closed)
-xdotool key "1"                                      # open details of channel 1
-sleep 0.2
-screenshot_region channel_2_details 16 207 451 351   # channel details (opened)
+screenshot_region_xw1 channel_1_overview 16 162 367 448  # channel overview (all channels still closed)
+xdotool key "1"                                          # open details of channel 1
+sleep 0.3
+screenshot_region_xw1 channel_2_details 16 207 451 351   # channel details (opened)
 xdotool key "1"
 
 # karaoke mode
@@ -445,14 +505,14 @@ screenshot_active_window soundcheck_1
 
 # drumkits
 xdotool key "9"                                      # select channel 9 (percussion)
-resize "Midica Soundcheck" 593 1400                  # make the window higher
+resize "Midica Soundcheck" 594 1400                  # make the window higher
 xdotool key "ctrl+i"                                 # focus instruments/drumkits table
 xdotool key "Down"
 xdotool key "Down"
 xdotool key "Down"
 xdotool key "Down"                                   # select room drumkit
 sleep 1
-screenshot_region soundcheck_2_drum 93 39 492 425    # drumkits table
+screenshot_region soundcheck_2_drum 93 39 492 424    # drumkits table
 
 # chromatic instruments
 xdotool key "2"                                      # select channel 2 (chromatic)
@@ -464,7 +524,7 @@ for ((i=0; i<33; i++)); do
 done
 sleep 0.5
 for ((i=0; i<13; i++)); do
-	xdotool key "Up"                             # select electric grand piano
+	xdotool key "Up"                                 # select electric grand piano
 done
 xdotool key "ctrl+n"                                 # focus notes table
 sleep 0.1
@@ -478,7 +538,7 @@ done
 sleep 2
 xdotool key "ctrl+shift+v"                           # focus velocity slider
 sleep 2
-screenshot_region soundcheck_3_chromatic 93 39 492 775  # combobox, instruments table and notes table
+screenshot_region soundcheck_3_chromatic 93 39 492 771  # combobox, instruments table and notes table
 
 # percussion
 xdotool key "9"                  # select channel 9 (percussion)
@@ -545,6 +605,7 @@ sleep 1
 for ((i=0; i<4; i++)); do
 	xdotool mousemove 382 236 click 5  # scroll down (so that the layers headline is in the second visible line)
 done
+move_mouse_away
 sleep 0.3
 screenshot_active_window info_soundbank_layer
 xdotool key "i"                            # select tab "Instruments & Drum Kits"
@@ -601,16 +662,16 @@ for ((i=0; i<8; i++)); do
 done
 sleep 1
 xdotool key "Page_Up"
-for ((i=0; i<13; i++)); do
+for ((i=0; i<6; i++)); do
 	xdotool key "Up"                   # go some lines up in the messages table
 done
 sleep 1
 xdotool key "Down"
 xdotool key "Down"
-xdotool key "Down"                         # focus Note-ON (bass_drum_1, tick 400, channel 9)
+xdotool key "Down"                     # focus Note-ON (bass_drum_1, tick 400, channel 9)
 sleep 0.2
 screenshot_active_window info_midi_messages_3
-xdotool key "Escape"                       # close info window
+xdotool key "Escape"                   # close info window
 sleep 0.5
 
 # key bindings
@@ -672,25 +733,25 @@ screenshot_active_window info_about
 # TABLE FILTER
 ###############
 
-xdotool key "shift+Tab"                                        # focus the tabs
-xdotool key "c"                                                # focus the configuration tab
+xdotool key "shift+Tab"                                            # focus the tabs
+xdotool key "c"                                                    # focus the configuration tab
 sleep 0.1
-screenshot_region table_filter_btn 564 66 28 28                # filter button (default)
-xdotool mousemove 575 77                                       # hover the button
+screenshot_region_xw2 table_filter_btn 564 66 28 28                # filter button (default)
+xdotool mousemove 575 77                                           # hover the button
 sleep 0.1
-screenshot_region table_filter_btn_mouse 564 66 28 28          # filter button (default + mouseover)
-xdotool mousemove 5 5                                          # un-hover the button
-xdotool key "f"                                                # open the table filter
+screenshot_region_xw2 table_filter_btn_mouse 564 66 28 28          # filter button (default + mouseover)
+xdotool mousemove 5 5                                              # un-hover the button
+xdotool key "f"                                                    # open the table filter
 sleep 0.1
-xdotool type "a#"                                              # type a string into the filter field
+xdotool type "a#"                                                  # type a string into the filter field
 sleep 0.1
 screenshot_active_window table_filter
-xdotool key "Escape"                                           # close the table filter
+xdotool key "Escape"                                               # close the table filter
 sleep 0.1
-screenshot_region table_filter_btn_changed 564 66 28 28        # filter button (changed)
-xdotool mousemove 575 77                                       # hover the button
+screenshot_region_xw2 table_filter_btn_changed 564 66 28 28        # filter button (changed)
+xdotool mousemove 575 77                                           # hover the button
 sleep 0.1
-screenshot_region table_filter_btn_changed_mouse 564 66 28 28  # filter button (changed + mouseover)
+screenshot_region_xw2 table_filter_btn_changed_mouse 564 66 28 28  # filter button (changed + mouseover)
 
 ###############
 # DECOMPILE RESULT
@@ -738,7 +799,7 @@ screenshot_region_tutorial instrument    17 162 395 89
 go_to_tick 2900
 xdotool key "l"                                        # switch to karaoke mode
 sleep 0.2
-screenshot_region_tutorial happy-birthday-3 9 37 275 255
+screenshot_region_tutorial happy-birthday-lyrics 9 37 275 255
 
 ###############
 # MIDICA REPOSITORY
