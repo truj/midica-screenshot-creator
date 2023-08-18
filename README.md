@@ -37,5 +37,6 @@ Automization solves this problem.
 
 # Limits
 
+- Does not work with wayland.
 - Tested only on my personal computer. Most likely it works only there.
 - This repository provides only the script but no example files to be imported/exported and also no soundfont files. This is mainly due to copyright issues but it's also because of lazyness.
