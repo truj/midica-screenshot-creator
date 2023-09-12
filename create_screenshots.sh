@@ -237,7 +237,7 @@ function open_export_file_chooser {
 # Assumes that the player window is open and currently active.
 function go_to_tick {
 	TICK=$1
-	xdotool key "f"           # focus the text field to enter the tick number
+	xdotool key "ctrl+f"      # focus the text field to enter the tick number
 	xdotool type "$TICK"      # enter the tick number
 	xdotool key "Return"
 	xdotool key "ctrl+a"      # select the tick number
@@ -279,7 +279,7 @@ MIDICA_PID=""
 # start Midica (main window)
 start_midica "--soundbank=$SB_PATH_DEFAULT" "--import=$MPL_DIR/london_bridge.midica"
 
-xdotool mousemove 382 236 click 1  # click remember soundbank
+xdotool key "alt+r"   # toggle remember soundbank
 screenshot_active_window main
 
 # config section
@@ -414,25 +414,25 @@ xdotool mousemove 5 5          # un-hover the button
 xdotool key "ctrl+o"
 sleep 0.7
 screenshot_active_window dc_1_debugging
-xdotool key "2"
+xdotool key "ctrl+2"
 sleep 0.1
 screenshot_active_window dc_2_note_length
-xdotool key "3"
+xdotool key "ctrl+3"
 sleep 0.1
 screenshot_active_window dc_3_chords
-xdotool key "4"
+xdotool key "ctrl+4"
 sleep 0.1
 screenshot_active_window dc_4_notes_rests
-xdotool key "5"
+xdotool key "ctrl+5"
 sleep 0.1
 screenshot_active_window dc_5_karaoke
-xdotool key "6"
+xdotool key "ctrl+6"
 sleep 0.1
 screenshot_active_window dc_6_control_change
-xdotool key "7"
+xdotool key "ctrl+7"
 sleep 0.1
 screenshot_active_window dc_7_extra_slices
-xdotool key "8"
+xdotool key "ctrl+8"
 sleep 0.1
 screenshot_active_window dc_8_line_settings
 
@@ -443,7 +443,7 @@ xdotool key "Escape"    # close decompile confifg window
 sleep 0.1
 screenshot_region_xw1 dc_button_invalid 180 336 36 37
 xdotool mousemove 195 350      # hover the button
-sleep 0.2
+sleep 0.3
 screenshot_region_xw1 dc_button_invalid_mouse 180 336 36 37
 
 ##############
@@ -452,7 +452,7 @@ screenshot_region_xw1 dc_button_invalid_mouse 180 336 36 37
 start_midica "--soundbank=$SB_PATH_GU" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
 
 # open player
-xdotool key "p"
+xdotool key "ctrl+p"
 sleep 7
 go_to_tick "8902"
 sleep 0.2
@@ -478,14 +478,14 @@ xdotool key "1"
 
 # karaoke mode
 go_to_tick "20217"
-xdotool key "l"     # switch to karaoke mode
+xdotool key "ctrl+l"     # switch to karaoke mode
 sleep 0.5
 screenshot_active_window karaoke
 
 ###############
 # SOUNDCHECK
 ###############
-xdotool key "s"       # open soundcheck window
+xdotool key "ctrl+s"  # open soundcheck window
 sleep 1
 xdotool key "ctrl+i"  # focus instruments table
 sleep 0.2
@@ -499,12 +499,12 @@ sleep 0.2
 xdotool key "Up"
 sleep 0.1
 xdotool key "Down"
-xdotool key "shift+v"  # focus volume slider
+xdotool key "alt+shift+v"  # focus volume slider
 sleep 1
 screenshot_active_window soundcheck_1
 
 # drumkits
-xdotool key "9"                                      # select channel 9 (percussion)
+xdotool key "ctrl+9"                                 # select channel 9 (percussion)
 resize "Midica Soundcheck" 594 1400                  # make the window higher
 xdotool key "ctrl+i"                                 # focus instruments/drumkits table
 xdotool key "Down"
@@ -515,7 +515,7 @@ sleep 1
 screenshot_region soundcheck_2_drum 93 39 492 424    # drumkits table
 
 # chromatic instruments
-xdotool key "2"                                      # select channel 2 (chromatic)
+xdotool key "ctrl+2"                                 # select channel 2 (chromatic)
 sleep 0.2
 xdotool key "ctrl+i"                                 # focus instruments table
 sleep 0.1
@@ -536,12 +536,12 @@ for ((i=0; i<10; i++)); do
 	xdotool key "Up"
 done
 sleep 2
-xdotool key "ctrl+shift+v"                           # focus velocity slider
+xdotool key "ctrl+alt+shift+v"                          # focus velocity slider
 sleep 2
 screenshot_region soundcheck_3_chromatic 93 39 492 771  # combobox, instruments table and notes table
 
 # percussion
-xdotool key "9"                  # select channel 9 (percussion)
+xdotool key "ctrl+9"             # select channel 9 (percussion)
 sleep 0.2
 xdotool key "ctrl+n"             # focus note/percussion table
 for ((i=0; i<11; i++)); do
@@ -563,34 +563,34 @@ sleep 0.3
 ###############
 
 # open info window
-xdotool key "i"
+xdotool key "ctrl+i"
 sleep 1
 
 # config
 screenshot_active_window info_conf_note
-xdotool key "p"
+xdotool key "ctrl+p"
 sleep 0.1
 screenshot_active_window info_conf_percussion
-xdotool key "d"
+xdotool key "ctrl+d"
 sleep 0.1
 screenshot_active_window info_conf_drumkit
-xdotool key "s"
+xdotool key "ctrl+s"
 resize "Midica Info" 973 770               # make the window higher
 sleep 0.1
 screenshot_active_window info_conf_syntax
-xdotool key "i"
+xdotool key "ctrl+i"
 sleep 0.1
 screenshot_active_window info_conf_instr
 xdotool key "Escape"                       # close info window
 sleep 0.5
 
 # soundbank
-xdotool key "i"                            # open info window
+xdotool key "ctrl+i"                       # open info window
 sleep 0.5
 xdotool key "Down"                         # select soundbank tab
 sleep 0.2
 screenshot_active_window info_soundbank_general
-xdotool key "r"                            # select resources tab
+xdotool key "ctrl+r"                       # select resources tab
 sleep 0.1
 screenshot_active_window info_soundbank_sample
 xdotool key "Tab"
@@ -608,26 +608,26 @@ done
 move_mouse_away
 sleep 0.3
 screenshot_active_window info_soundbank_layer
-xdotool key "i"                            # select tab "Instruments & Drum Kits"
+xdotool key "ctrl+i"                       # select tab "Instruments & Drum Kits"
 sleep 0.1
 resize "Midica Info" 973 1200              # make the window higher
 screenshot_active_window info_soundbank_instr
 
 # midi info
 start_midica "--soundbank=$SB_PATH_DEFAULT" "--import=$MPL_DIR/sk_london_bridge.midica"
-xdotool key "i"                            # open info window
+xdotool key "ctrl+i"                       # open info window
 sleep 1
-xdotool key "m"                            # select tab: MIDI
+xdotool key "ctrl+m"                       # select tab: MIDI
 sleep 0.1
 screenshot_active_window info_midi_general
-xdotool key "k"                            # select sub tab: Karaoke
+xdotool key "ctrl+k"                       # select sub tab: Karaoke
 sleep 0.1
 screenshot_active_window info_midi_karaoke
 start_midica "--soundbank=$SB_PATH_DEFAULT" "--import-midi=$MIDI_DIR/achy_breaky_heart.kar"
-xdotool key "i"                            # open info window
+xdotool key "ctrl+i"                       # open info window
 sleep 1
-xdotool key "m"                            # select tab: MIDI
-xdotool key "b"                            # select sub tab: banks/instruments/notes
+xdotool key "ctrl+m"                       # select tab: MIDI
+xdotool key "ctrl+b"                       # select sub tab: banks/instruments/notes
 resize "Midica Info" 973 800               # make the window higher
 sleep 0.3
 screenshot_active_window info_midi_banks_1
@@ -638,7 +638,7 @@ xdotool key "shift+Tab"
 xdotool key "shift+Tab"                    # focus main tab (MIDI sequence)
 sleep 0.5
 screenshot_active_window info_midi_banks_2
-xdotool key "m"                            # select sub tab: messages
+xdotool key "ctrl+m"                       # select sub tab: messages
 sleep 0.5
 screenshot_active_window info_midi_messages_1
 xdotool mousemove 588 260 mousedown 1 mousemove_relative --sync 0 340 mouseup 1  # drag divider down
@@ -675,57 +675,47 @@ xdotool key "Escape"                   # close info window
 sleep 0.5
 
 # key bindings
-xdotool key "i"       # open info window
+xdotool key "ctrl+i"          # open info window
 sleep 1
-xdotool key "Down"
-xdotool key "Down"
-xdotool key "Down"    # select tab: key bindings
+xdotool key "ctrl+k"          # select tab: key bindings
 sleep 0.2
-xdotool key  "f"      # focus the filter field
-xdotool type "Ctrl"   # write into the filter field
-xdotool key  "Tab"    # focus the tree
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"   # focus soundcheck node
-xdotool key  "Right"  # open soundcheck node
-xdotool key  "Up"
-xdotool key  "Up"
-xdotool key  "Up"     # focus main window node
-xdotool key  "Right"  # open main window node
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"   # focus node: "Load soundbank file"
+xdotool key  "ctrl+f"         # focus the filter field
+xdotool type "Ctrl+Shift"     # write into the filter field
+xdotool key  "ctrl+t"         # focus the tree
+for ((i=0; i<11; i++)); do
+	xdotool key "Down"        # focus "Audio Export Config Window" node
+done
+xdotool key "Right"           # open "Audio Export Config Window" node
+sleep 0.1
+xdotool key "Up"              # focus "Decompile Config Window" node
+xdotool key "Right"           # open "Decompile Config Window" node
+xdotool key "Page_Down"       # focus the bottom node in the tree
+sleep 0.1
+for ((i=0; i<4; i++)); do
+	xdotool key "Up"          # focus the node "Audio Export Config" > "Focus Field: Sample Size in Bits"
+done
 sleep 0.2
 screenshot_active_window info_keybinding_1
-xdotool key  "f"          # focus the filter field
-xdotool key  "ctrl+a"     # mark all text
-xdotool key  "Delete"     # delete the text
-xdotool key  "shift+Tab"  # leave the text field
-xdotool key  "t"          # focus the tree
-xdotool key  "Up"
-xdotool key  "Up"
-xdotool key  "Up"         # focus soundcheck node
-xdotool key  "Left"       # close soundcheck node
-xdotool key  "ctrl+Home"  # go to top node
-xdotool key  "Down"       # focus main node
-xdotool key  "Left"       # close main node
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"
-xdotool key  "Down"       # focus message window node
-xdotool key  "Right"      # open message window node
-xdotool key  "Down"       # focus "close the message window"
-xdotool key  "ctrl+k"     # focus text field: "add key binding"
-xdotool key  "ctrl+alt+shift+space"  # simulate new key binding
+
+xdotool key "Escape"      # close info window
+sleep 0.5
+xdotool key "ctrl+i"      # open info window
+sleep 1
+xdotool key "ctrl+k"      # select tab: key bindings
+xdotool key "ctrl+t"      # focus the tree
+for ((i=0; i<7; i++)); do
+	xdotool key "Down"    # focus "Message Window" node
+done
+xdotool key "Right"       # open "Message Window" node
+xdotool key "Down"        # focus "close the message window"
+xdotool key "ctrl+k"      # focus text field: "add key binding"
+xdotool key "ctrl+alt+shift+space"  # simulate new key binding
 sleep 0.2
 screenshot_active_window info_keybinding_2
 
 # about
-xdotool key "Tab"  # leave field: "add key binding"
-xdotool key "a"    # select "about" tab
+xdotool key "Tab"         # leave field: "add key binding"
+xdotool key "ctrl+a"      # select "about" tab
 sleep 0.2
 screenshot_active_window info_about
 
@@ -734,7 +724,7 @@ screenshot_active_window info_about
 ###############
 
 xdotool key "shift+Tab"                                            # focus the tabs
-xdotool key "c"                                                    # focus the configuration tab
+xdotool key "ctrl+c"                                               # focus the configuration tab
 sleep 0.1
 screenshot_region_xw2 table_filter_btn 564 66 28 28                # filter button (default)
 xdotool mousemove 575 77                                           # hover the button
@@ -787,7 +777,7 @@ rm $DECOMPILE_DIR/tmpfile.mpl                            # delete the exported f
 ###############
 
 start_midica "--soundbank=$SB_PATH_GU" "--import=$TUT_FILES_DIR/happy_birthday_instruments.midica"
-xdotool key "p"                                        # open player
+xdotool key "ctrl+p"                                   # open player
 sleep 7
 screenshot_region_tutorial instruments-2 17 162 395 449
 go_to_tick 7000
@@ -797,7 +787,7 @@ go_to_tick 7400
 sleep 0.2
 screenshot_region_tutorial instrument    17 162 395 89
 go_to_tick 2900
-xdotool key "l"                                        # switch to karaoke mode
+xdotool key "ctrl+l"                                   # switch to karaoke mode
 sleep 0.2
 screenshot_region_tutorial happy-birthday-lyrics 9 37 275 255
 
